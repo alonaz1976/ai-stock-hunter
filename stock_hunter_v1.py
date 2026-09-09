@@ -51,7 +51,15 @@ def analyze(df:pd.DataFrame,ticker='TICKER'):
     R=rsi(c); A=atr(h,l,c); C=cmf(h,l,c,v); O=obv(c,v)
     vol20=v.rolling(20).mean(); RV=v/vol20
     if len(df)<210: raise ValueError('Need at least 210 daily bars')
-    i=-1; price=c.iloc[i]; av=A.iloc[i]
+    i = -1
+price = float(c.iloc[i])
+
+av = A.iloc[i]
+if pd.isna(av) or av <= 0:
+    av = float((h - l).tail(14).mean())
+
+if pd.isna(av) or av <= 0:
+    av = max(price * 0.02, 0.01)
     # Smart money: volume + money flow + OBV trend + constructive price/volume behavior.
     sm=0
     sm += clamp((RV.iloc[i]-0.8)/1.7*30,0,30)
