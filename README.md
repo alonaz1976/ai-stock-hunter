@@ -1,24 +1,11 @@
-# AI Stock Hunter V1
+# AI Stock Hunter V2
 
-A mobile-friendly Streamlit dashboard for the first quantitative engine.
+Adds automatic Yahoo Finance market data, single-stock analysis, and a multi-stock opportunity scanner.
 
-## Included
-- RSI, MACD, EMA20/50/200, ATR, OBV, CMF, Relative Volume
-- Smart Money Score (0-100)
-- Entry Score (0-100)
-- Market-behavior Stock Score (0-100)
-- Early Accumulation detection
-- Entry zone, invalidation, Target 1/2
-- Walk-forward backtest (no future data used to create each signal)
+## New in V2
+- Scan a default 25-stock watchlist or paste up to 60 tickers.
+- Rank by Opportunity Score = 50% Entry + 35% Smart Money + 15% Stock behavior.
+- Shows Smart Money, Entry Score, RSI, RVOL, CMF, Early Accumulation and Entry/Invalidation/Targets.
+- Keeps walk-forward backtesting for individual tickers.
 
-## Run
-1. Install Python 3.10+.
-2. Open a terminal in this folder.
-3. `pip install -r requirements.txt`
-4. `streamlit run app.py`
-5. Upload a daily OHLCV CSV with at least 210 rows.
-
-Required CSV columns: Open, High, Low, Close, Volume (case-insensitive).
-
-## Next milestone
-Connect a market-data API, add valuation/fundamentals, then scan NASDAQ + NYSE and rank the strongest candidates.
+Next planned layer: valuation and fundamentals, then real-time market-data provider.
