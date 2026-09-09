@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+import yfinance as yf
 from stock_hunter_v1 import analyze, backtest
 
 st.set_page_config(page_title='AI Stock Hunter', page_icon='📈', layout='wide')
@@ -14,24 +15,41 @@ with st.sidebar:
     st.divider()
     st.caption('V1 uses OHLCV only. Valuation and fundamentals will be added in V2.')
 
-uploaded = st.file_uploader('Upload daily OHLCV CSV', type=['csv'], help='Required columns: Open, High, Low, Close, Volume. At least 210 daily bars.')
+st.subheader("Live market data")
 
-if uploaded is None:
-    st.info('Upload a CSV to run the engine. Live market data will be connected after the backtest phase.')
-    st.markdown('### What the dashboard will show')
-    demo = pd.DataFrame([
-        {'Ticker':'ABC','Stock':91,'Entry':94,'Smart Money':96,'Signal':'🟢 BUY ZONE'},
-        {'Ticker':'XYZ','Stock':88,'Entry':91,'Smart Money':93,'Signal':'🐋 EARLY ACCUMULATION'},
-        {'Ticker':'DEF','Stock':94,'Entry':67,'Smart Money':89,'Signal':'🟡 WAIT'},
-    ])
-    st.dataframe(demo, use_container_width=True, hide_index=True)
-    st.stop()
+period = st.selectbox(
+    "History period",
+    ["1y", "2y", "5y"],
+    index=1
+)
 
-try:
-    df = pd.read_csv(uploaded)
-    result = analyze(df, ticker)
-except Exception as e:
-    st.error(f'Could not analyze the file: {e}')
+if st.button("Analyze stock", use_container_width=True):
+    try:
+        with st.spinner(f"Downloading market data for {ticker}..."):
+            df = yf.download(
+                ticker,
+                period=period,
+                interval="1d",
+                auto_adjust=False,
+                progress=False
+            )
+
+        if df.empty:
+            st.error("No market data found for this ticker.")
+            st.stop()
+
+        if isinstance(df.columns, pd.MultiIndex):
+            df.columns = df.columns.get_level_values(0)
+
+        df = df.reset_index()
+
+        result = analyze(df, ticker)
+
+    except Exception as e:
+        st.error(f"Could not analyze {ticker}: {e}")
+        st.stop()
+else:
+    st.info("Enter a ticker and press Analyze stock.")
     st.stop()
 
 c1,c2,c3,c4 = st.columns(4)
